@@ -117,7 +117,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">3</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">6</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -171,6 +171,208 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://github.com/LZXdeGitHub/LZXdeGitHub.github.io/2020/10/05/20201005-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Nick Liu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="会电臀舞的小柯基">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/05/20201005-1/" class="post-title-link" itemprop="url">python脚本搭建编译框架</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-05 17:14:55" itemprop="dateCreated datePublished" datetime="2020-10-05T17:14:55+08:00">2020-10-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-10-08 20:58:11" itemprop="dateModified" datetime="2020-10-08T20:58:11+08:00">2020-10-08</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>目前博主，接触到了一些资深开发工程师，分享了一套采用python语言搭建提高效率的编译框架，抽离公共部分，组建独立仓库，给手机负责通信的模块代码搭建编译框架，并且将很多关于各个团队的feature宏抽离出来，从第三方的源代码解耦出来，在一个单独的fd文件中进行管控，而各平台的差异在平台专有的json文件中描述，并且可以更快的模块化编译。勾起了博主比较想深入研究一下这套东西的欲望。</p>
+<p>大多数Linux发行版本中，python是其标准系统组件，可以直接运行用python编写的代码。并且通常情况下，用python编写的脚本易于理解、扩展、维护和复用，性能也优于shell脚本，并且python本身更能让你专注于解决问题而不是去搞明白语言本身。有很多公司采用python搭建编译框架。</p>
+<p>例如，一些手机设备厂商，会购买高通很多芯片平台，这些芯片平台的软件代码购买过来后，手机设备厂商有很多客制化的代码，需要移植在各个平台，并且各个平台有自己的一套shell编译脚本，需要单独移植和适配。采用pthon编译框架后，单独的仓库和分支，可以方便很多feature和多平台的管理，并且可以快速适配新平台，提高了代码移植和适配的效率降低出错的可能性。</p>
+<p>查看高通给过来的源代码，使用的就是python来组织编译的脚本，一些终端设备厂商更多的是向高通看齐。</p>
+<h2 id="shell脚本运行python"><a href="#shell脚本运行python" class="headerlink" title="shell脚本运行python"></a>shell脚本运行python</h2><p>在模块编译的时候，大家都习惯了shell脚本编译，于是乎就有了在shell脚本中去运行pthon脚本。</p>
+<p>shell脚本中，指定python编译版本(which python指令查看应用安装路径)和传递给python脚本的参数：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">echo "传递的参数为：$*"</span><br><span class="line">python_install_path=`whereis python`</span><br><span class="line">path_name="/Volumes/MyHD/shell_python"</span><br><span class="line">python_name="shell.py"</span><br><span class="line"><span class="meta">$</span><span class="bash">&#123;python_install_path&#125;2.7 <span class="variable">$path_name</span>/<span class="variable">$python_name</span> <span class="variable">$1</span></span></span><br></pre></td></tr></table></figure>
+
+<p>python脚本：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> xrange(<span class="number">0</span>,int(sys.argv[<span class="number">1</span>])):</span><br><span class="line">		<span class="keyword">print</span> <span class="string">"Hello World"</span> + str(x)</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<img src="/2020/10/05/20201005-1/script.png" class title="python.sh">
+
+<h2 id="make"><a href="#make" class="headerlink" title="make"></a>make</h2><p>终端设备的代码主要分为AP(application processor)侧和CP(communication processor)侧，CP侧主要是一些通信模块，例如，基带处理器(baseband processor)、rf器件等，对应的代码这块都是用C/C++语言编写，对于这些代码的编译就有很多值得学习的地方。</p>
+<p>对于C/C++语言的编译分为四个阶段：预处理、编译、汇编和链接</p>
+<p>未完待续…….</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://github.com/LZXdeGitHub/LZXdeGitHub.github.io/2020/10/05/20201005/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Nick Liu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="会电臀舞的小柯基">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/05/20201005/" class="post-title-link" itemprop="url">硬编码和软编码</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-10-05 16:57:58 / 修改时间：19:53:53" itemprop="dateCreated datePublished" datetime="2020-10-05T16:57:58+08:00">2020-10-05</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在工作过程中，听到同事说起，硬编码和软编码，大脑大概明白其意思，具体一想，如何专业的表述这对孪生概念呢，需要展开来了解一下。</p>
+<p>在网上查阅这两个概念，由于当前短视频较火，这两个概念在视频编解码方面有所指，硬编码是利用硬件芯片本身GPU、DSP等非CPU去给视频编码，而软编码则指是通过软件本身或者CPU对视频进行编码。</p>
+<p>而目前我在工作中接触的这两个概念主要是针对代码的灵活性和可扩展性角度来讲的，更多的是一种设计思想。</p>
+<h2 id="硬编码"><a href="#硬编码" class="headerlink" title="硬编码"></a>硬编码</h2><p>简单直白的说就是写死值，之前博主在一家公司写代码的时候，称这种在代码中是一种<strong>坏味道</strong>，例如，<code>if（a == 10）</code>，这个10一看不知道是什么意思，直接用的<strong>魔数</strong>。亦或解析某个路径下的文件，写代码时，直接将这个文件路径固定，不管以后是否挪到了其他路径，默认它就永远是在那个路径下，没有考虑变化。</p>
+<h2 id="软编码"><a href="#软编码" class="headerlink" title="软编码"></a>软编码</h2><p>一句话来说，定好地方，方便后续修改和扩展。在大型软件编码中，软编码很重要，会有很多地方用到相同的值，如果是在某个地方定义好值，在代码中用它的别称，如果后续这个值有变化，可以很方便的修改，只需在一处修改。软编码可以理解为以不变应万变，这个不变是指在代码中大部分逻辑不需要动，变是指后续市场需求的变化而需要软件做的一些适配，而这种适配只需要修改某些小角落。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://github.com/LZXdeGitHub/LZXdeGitHub.github.io/2020/09/20/20200920/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Nick Liu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="会电臀舞的小柯基">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/09/20/20200920/" class="post-title-link" itemprop="url">Telephony框架</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-09-20 16:28:31 / 修改时间：16:32:51" itemprop="dateCreated datePublished" datetime="2020-09-20T16:28:31+08:00">2020-09-20</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://github.com/LZXdeGitHub/LZXdeGitHub.github.io/2020/09/13/20200913/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -194,10 +396,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-09-13 18:04:13 / 修改时间：19:17:50" itemprop="dateCreated datePublished" datetime="2020-09-13T18:04:13+08:00">2020-09-13</time>
+              <time title="创建时间：2020-09-13 18:04:13" itemprop="dateCreated datePublished" datetime="2020-09-13T18:04:13+08:00">2020-09-13</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-09-20 16:25:55" itemprop="dateModified" datetime="2020-09-20T16:25:55+08:00">2020-09-20</time>
+              </span>
 
           
 
@@ -229,7 +437,7 @@
 <li><strong>代码缩减（即摇树优化）</strong>：从应用及其库依赖项中检测并安全地移除未使用的类、字段、方法和属性（这使其成为了一个对于规避 <a href="https://developer.android.com/studio/build/multidex?hl=zh-cn" target="_blank" rel="noopener">64k 引用限制</a>非常有用的工具）。例如，如果您仅使用某个库依赖项的少数几个 API，缩减功能可以识别应用“未”使用的库代码并仅从应用中移除这部分代码。如需了解详情，请转到介绍如何<a href="https://developer.android.com/studio/build/shrink-code?hl=zh-cn#shrink-code" target="_blank" rel="noopener">缩减代码</a>的部分。</li>
 <li><strong>资源缩减</strong>：从封装应用中移除不使用的资源，包括应用库依赖项中的不使用的资源。此功能可与代码缩减功能结合使用，这样一来，移除不使用的代码后，也可以安全地移除不再引用的所有资源。如需了解详情，请转到介绍如何<a href="https://developer.android.com/studio/build/shrink-code?hl=zh-cn#shrink-resources" target="_blank" rel="noopener">缩减资源</a>的部分。</li>
 <li><strong>混淆处理</strong>：缩短类和成员的名称，从而减小 DEX 文件的大小。如需了解详情，请转到介绍如何<a href="https://developer.android.com/studio/build/shrink-code?hl=zh-cn#obfuscate" target="_blank" rel="noopener">对代码进行混淆处理</a>的部分。</li>
-<li><strong>优化</strong>：检查并重写代码，以进一步减小应用的 DEX 文件的大小。例如，如果 R8 检测到从未采用过给定 if/else 语句的 <code>else {}</code> 分支，则会移除 <code>else {}</code> 分支的代码。如需了解详情，请转到介绍<a href="https://developer.android.com/studio/build/shrink-code?hl=zh-cn#optimization" target="_blank" rel="noopener">代码优化</a>的部分。</li>
+<li><strong>优化</strong>：检查并重写代码，以进一步减小应用的 DEX 文件的大小。例如，如果 R8 检测到从未采用过给定 <code>if/else</code> 语句的 <code>else {}</code> 分支，则会移除 <code>else {}</code> 分支的代码。如需了解详情，请转到介绍<a href="https://developer.android.com/studio/build/shrink-code?hl=zh-cn#optimization" target="_blank" rel="noopener">代码优化</a>的部分。</li>
 </ul>
 
       
@@ -515,12 +723,12 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
